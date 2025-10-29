@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cost of Outage Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1d1230;
+    --muted:#6b6180;
+    --panel:#ffffff;
+    --bg:#f6f5fa;
+    --outline:#e8e6f0;
+    --accent:#b003d3;   /* purple like the screenshot */
+    --accent-dark:#4d10a5;
+    --accent-strong:#b003d3;
+    --radius:16px;
+    --shadow:0 2px 6px rgba(13,11,24,.05), 0 10px 30px rgba(13,11,24,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: Euclid Circular A;
+    color:var(--ink);
+    background:var(--bg);
+  }
+
+  /* Shell */
+  .shell{
+    max-width:1180px;
+    margin:32px auto;
+    padding:8px 16px 40px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--outline);
+    border-radius:28px;
+    box-shadow:var(--shadow);
+    padding:28px;
+  }
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:10px 14px 22px;
+  }
+  .title{
+    font-size:clamp(28px, 4vw, 44px);
+    font-weight:900;
+    letter-spacing:.2px;
+  }
+
+  /* 2-column layout like screenshot */
+  .grid{
+    display:grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap:28px;
+  }
+
+  /* Left side */
+  .panel{
+    background:#fbfafc;
+    border:1px solid var(--outline);
+    border-radius:20px;
+    padding:20px;
+  }
+  .panel h3{
+    font-size:18px;
+    font-weight:700;
+    margin:0 0 14px;
+  }
+  .row{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  label{
+    font-size:14px;
+    font-weight:600;
+  }
+  .input{
+    height:56px;
+    border:1.5px solid var(--outline);
+    border-radius:14px;
+    background:#fff;
+    font-size:20px;
+    padding:0 16px;
+    color:var(--ink);
+    width:100%;
+    outline:none;
+  }
+  .input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(110,25,201,.14);
+  }
+
+  .tip{
+    font-size:13px;
+    color:var(--muted);
+    margin:12px 0 18px;
+    line-height:1.45;
+  }
+
+  .formula{
+    border:1px dashed var(--outline);
+    border-radius:18px;
+    padding:18px 16px;
+    background:#fff;
+  }
+  .formula .eq{
+    text-align:center;
+    font-weight:900;
+    font-size:18px;
+    line-height:1.25;
+  }
+  .formula .sm{
+    font-size:13px;
+    color:var(--muted);
+    font-weight:600;
+  }
+  .divider{
+    height:1px;
+    background:var(--outline);
+    margin:14px 0;
+  }
+
+  /* Right side result */
+  .result{
+    background:#faf7ff;
+    border:1px solid var(--outline);
+    border-radius:20px;
+    padding:18px;
+  }
+  .result .head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+  .badge{
+    font-size:13px;
+    font-weight:700;
+    border:1px solid var(--outline);
+    background:#fff;
+    padding:6px 10px;
+    border-radius:999px;
+  }
+  .big{
+    font-size:clamp(40px, 6vw, 72px);
+    font-weight:900;
+    color:var(--accent);
+    letter-spacing:1px;
+    margin:6px 0 8px;
+  }
+  .blurb{
+    font-size:16px;
+    background:#fff;
+    border:1px solid var(--outline);
+    border-radius:14px;
+    padding:14px 16px;
+  }
+
+  /* Sticky footer URL */
+  .footer{
+    text-align:center;
+    margin-top:18px;
+    font-size:14px;
+    color:var(--muted);
+  }
+  .footer a{ color:var(--accent); text-decoration:none; font-weight:700; }
+  .footer a:focus, .footer a:hover{ text-decoration:underline; }
+
+  @media (max-width:900px){
+    .grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div class="toolbar">
+        <div class="title">Cost of Outage Calculator</div>
+      </div>
+
+      <div class="grid">
+        <section class="panel">
+          <h3>Enter your numbers</h3>
+
+          <div class="row">
+            <label for="rev">Revenue per hour</label>
+            <input class="input" inputmode="decimal" type="text" id="rev" placeholder="0" aria-labelledby="lbl-rev" />
+          </div>
+
+          <div class="row">
+            <label for="prod">Estimated productivity losses</label>
+            <input class="input" inputmode="decimal" type="text" id="prod" placeholder="0" aria-labelledby="lbl-prod" />
+          </div>
+
+          <div class="row">
+            <label for="it">IT recovery fees</label>
+            <input class="input" inputmode="decimal" type="text" id="it" placeholder="0" aria-labelledby="lbl-it" />
+          </div>
+
+          <div class="row">
+            <label for="hours">Hours of downtime</label>
+            <input class="input" inputmode="decimal" type="text" id="hours" placeholder="0" aria-labelledby="lbl-hours" />
+          </div>
+
+          <p class="tip">Tip: Total equals the sum of the first three fields multiplied by hours of downtime.</p>
+
+          <div class="formula" aria-hidden="true">
+            <div class="eq">
+              ( Revenue per hour + Estimated productivity losses + IT recovery fees ) × Hours of downtime
+            </div>
+          </div>
+        </section>
+
+        <section class="result" role="group" aria-labelledby="total-heading">
+          <div class="head">
+            <span class="badge">Result</span>
+          </div>
+          <div id="total" class="big" aria-live="polite">$0</div>
+          <div class="blurb">Cost of Outage</div>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer">Learn more at <a href="https://lumosfiber.com" target="_blank" rel="noopener">lumosfiber.com</a>.</div>
+  </div>
+
+<script>
+  // Helper: parse flexible numeric input like "1,200" or "$3,450.50"
+  function toNumber(v){
+    if(typeof v !== 'string') return Number(v) || 0;
+    const cleaned = v.replace(/[^0-9.\\-]/g,'');
+    const num = parseFloat(cleaned);
+    return isFinite(num) ? num : 0;
+  }
+
+  const fmt = new Intl.NumberFormat(undefined,{ style:'currency', currency:'USD', maximumFractionDigits:2 });
+
+  const els = {
+    rev: document.getElementById('rev'),
+    prod: document.getElementById('prod'),
+    it: document.getElementById('it'),
+    hours: document.getElementById('hours'),
+    total: document.getElementById('total'),
+  };
+
+  function compute(){
+    const sum = toNumber(els.rev.value) + toNumber(els.prod.value) + toNumber(els.it.value);
+    const hours = toNumber(els.hours.value);
+    const result = sum * hours;
+    els.total.textContent = fmt.format(isFinite(result) ? result : 0);
+  }
+
+  // Auto-update on any input
+  Object.values(els).forEach(el => {
+    if(el instanceof HTMLElement && el.tagName === 'INPUT'){
+      el.addEventListener('input', compute);
+      el.addEventListener('blur', compute);
+    }
+  });
+
+  compute(); // Initialize
+</script>
+</body>
+</html>
